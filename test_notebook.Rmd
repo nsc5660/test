@@ -1,0 +1,57 @@
+---
+title: "title"
+author: "name"
+date: "date"
+output:
+   html_document:
+      keep_md: true
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(choroplethr)
+library(choroplethrAdmin1)
+
+library(ggplot2)
+data(admin1.map)
+ggplot(admin1.map, aes(long, lat, group=group))+geom_polygon()
+
+data(admin1.regions)
+
+head(admin1.regions)
+
+#unique(admin1.regions$country)
+
+data(df_japan_census)
+head(df_japan_census)
+
+df_japan_census$value = df_japan_census$pop_density_km2_2010
+admin1_choropleth("japan", df_japan_census)
+admin1_choropleth("japan", df_japan_census, num_colors=1)
+admin1_choropleth("japan", df_japan_census, num_colors=1, reference_map=TRUE)
+
+#install.packages("devtools")
+library(devtools)
+
+#install_github("duncantl/XMLRPC")
+#install_github("duncantl/RWordPress")
+#install.packages("knitr")
+
+library(XMLRPC)
+library(RWordPress)
+library(knitr)
+
+#options(WordpressLogin = c('nsc5660' = 'nschjj0116'),WordpressURL = 'http://blog.naver.com/nsc5660')
+
+#작성한 Rmd 파일명을 입력하고 인코딩 명시 
+#knit2wp('C:/work/201711_AURI/mapping/test_markdown.Rmd', title = '포스팅하기', encoding="cp949") 
+
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
