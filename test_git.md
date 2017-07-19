@@ -1,6 +1,9 @@
 Untitled
 ================
 
+output: rmarkdown::github\_document
+-----------------------------------
+
 R Markdown
 ----------
 
