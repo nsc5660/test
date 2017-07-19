@@ -1,0 +1,99 @@
+first_rpres
+========================================================
+author: 
+date: 
+autosize: true
+
+First Slide
+========================================================
+
+For more details on authoring R presentations please visit <https://support.rstudio.com/hc/en-us/articles/200486468>.
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+Slide With Code
+========================================================
+
+```{r}
+
+######### host type ################
+
+distinct(ab_data,city,host_id) %>% summarise(host=n()) ## host의수 
+
+
+host_nm <- ab_data %>% group_by(city,host_id) %>% summarize(rooms=n())
+
+#host_nm <- as.data.frame(table(ab_data$host_id))
+#colnames(host_nm) <- c("host_id","rooms")
+#apply(host_nm[2],2,sum)
+
+host_nm$host_ty<- NA
+host_nm$host_ty[host_nm$rooms ==1] <- 1
+host_nm$host_ty[host_nm$rooms ==2] <- 2
+host_nm$host_ty[host_nm$rooms >=3 & host_nm$rooms <= 10 ] <- 3
+host_nm$host_ty[host_nm$rooms > 10 ] <- 4
+
+host_nm$host_ty <- ordered(host_nm$host_ty,levels=c(1,2,3,4),labels=c("1개","2개","3개이상","10개이상"))
+
+
+#host_nm2 <- merge(host_nm,ab_data[,c("host_id","city")],by="host_id",all.x=TRUE)
+#with(host_nm2,CrossTable(city,host_ty,expected=F,prop.c=F, prop.r=T,prop.t=F,prop.chisq=F,chisq=T))
+
+temp <- host_nm %>% group_by(city,host_ty) %>% summarize(room_nm=sum(rooms)) %>% mutate(percent=room_nm/sum(room_nm)*100) 
+write.csv(temp, 'host_type.csv')
+
+ggplot(temp,aes(x=reorder(city,-room_nm),y=room_nm,fill=host_ty))+geom_bar(stat='identity')
+ggplot(temp,aes(x=city,y=percent,fill=host_ty))+geom_bar(stat='identity')
+ggplot(temp,aes(x="",y=percent,fill=host_ty))+geom_bar(stat='identity')+facet_wrap(~city,ncol=3)+coord_polar("y")+ggtitle("세계 주요 도시 Airbnb 호스트 유형")+theme(plot.title=element_text(hjust=0.5))
+
+#ggplot(temp,aes(x="",y=percent,fill=host_ty))+geom_bar(stat='identity')+facet_wrap(~city,ncol=4)+coord_polar("y")+geom_text(aes(label=round(percent,1),size=5))+ggtitle("세계 주요 도시 Airbnb 호스트 유형")+theme(plot.title=element_text(hjust=0.5))
+
+room_cd <- ab_data %>% group_by(city,room_type) %>% summarize(rooms=n())
+
+#host_nm <- as.data.frame(table(ab_data$host_id))
+#colnames(host_nm) <- c("host_id","rooms")
+#apply(host_nm[2],2,sum)
+
+#roomd_cd$host_ty<- NA
+#roomd_cd$host_ty[host_nm$rooms ==1] <- 1
+#roomd_cd$host_ty[host_nm$rooms ==2] <- 2
+#roomd_cd$host_ty[host_nm$rooms >=3 & host_nm$rooms <= 10 ] <- 3
+#roomd_cd$host_ty[host_nm$rooms > 10 ] <- 4
+#host_nm$host_ty <- ordered(host_nm$host_ty,levels=c(1,2,3,4),labels=c("1개","2개","3개이상","10개이상"))
+#host_nm2 <- merge(host_nm,ab_data[,c("host_id","city")],by="host_id",all.x=TRUE)
+#with(host_nm2,CrossTable(city,host_ty,expected=F,prop.c=F, prop.r=T,prop.t=F,prop.chisq=F,chisq=T))
+
+########### room type ###########
+
+temp2 <- room_cd %>% group_by(city,room_type) %>% summarize(room_nm=sum(rooms)) %>% mutate(percent=room_nm/sum(room_nm)*100) 
+
+ggplot(temp2,aes(x=reorder(city,-room_nm),y=room_nm,fill=room_type))+geom_bar(stat='identity')
+ggplot(temp2,aes(x=city,y=percent,fill=room_type))+geom_bar(stat='identity')
+
+
+ggplot(temp2,aes(x="",y=percent,fill=room_type))+geom_bar(stat='identity')+facet_wrap(~city,ncol=3)+coord_polar("y")+ggtitle("세계 주요 도시 Airbnb room 유형")+theme(plot.title=element_text(hjust=0.5))
+
+#ggplot(temp,aes(x="",y=percent,fill=host_ty))+geom_bar(stat='identity')+facet_wrap(~city,ncol=4)+coord_polar("y")+geom_text(aes(label=round(percent,1),size=5))+ggtitle("세계 주요 도시 Airbnb 호스트 유형")+theme(plot.title=element_text(hjust=0.5))
+
+
+
+########### price ###########
+
+with(ab_data,tapply(price,city,summary))
+
+price_table <- as.data.frame(ab_data %>% filter(price != 'NA') %>% group_by(city,room_type) %>% summarize(ct=n(),mean=mean(price),median=median(price),max=max(price),min=min(price),std=sd(price)))
+
+write.csv(price_table,'price.csv')
+
+ab_data %>% filter(room_type=='Entire home/apt') %>% ggplot(aes(x=log(price),group=city,color=city))+geom_density()
+
+price_table %>% filter(room_type=='Entire home/apt') %>% mutate(cv=std/mean) %>% ggplot(aes(x=median,y=cv,color=city))+geom_point(aes(size=cv))
+
+ab_data %>% filter(room_type=='Entire home/apt') %>% ggplot(aes(x=city, y=log(price)))+geom_boxplot()
+                                               
+                                               
+
+
+```
